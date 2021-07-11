@@ -1,0 +1,158 @@
+import tkinter as tk
+from tkinter import ttk
+from .colour import Colour
+
+
+class Calculator:
+    def __init__(self):
+        self.pad_x = 0
+        self.pad_y = 18
+
+        self.root = tk.Tk()
+        self.style = ttk.Style(self.root)
+        self.equation_lbl = tk.Label(self.root, text="0", bg=Colour.BACK, fg=Colour.BEIGE, anchor=tk.S,
+                                     font=("calibri", 15))
+        self.result = tk.Label(self.root, text="", bg=Colour.BACK, fg="white", anchor=tk.N, font=("calibri", 30))
+
+        self.setup()
+
+    def setup(self):
+        self.root.geometry("320x500")
+        self.root.title("Calculator")
+        self.root.configure(bg=Colour.BACK)
+
+        self.equation_lbl.grid(column=1, row=1, ipady=15, columnspan=3, sticky=tk.E)
+
+        self.result.grid(column=1, row=2, ipady=25, columnspan=3, sticky=tk.E)
+
+        style = ttk.Style(self.root)
+        style.theme_use("clam")
+        style.configure("TButton",
+                        background=Colour.MAIN_BTN["background"],
+                        foreground="black",
+                        bordercolor=Colour.MAIN_BTN["background"],
+                        lightcolor=Colour.MAIN_BTN["border"],
+                        darkcolor=Colour.MAIN_BTN["border"])
+
+        style.map('TButton',
+                  background=[('active', Colour.MAIN_BTN["back_act"])],
+                  foreground=[('active', 'black')],
+                  lightcolor=[('active', Colour.MAIN_BTN["border_act"])],
+                  darkcolor=[('active', Colour.MAIN_BTN["border_act"])])
+
+        style.configure("Equal.TButton",
+                        background=Colour.EQUAL_BTN["background"],
+                        lightcolor=Colour.EQUAL_BTN["background"],
+                        darkcolor=Colour.EQUAL_BTN["background"])
+
+        style.map("Equal.TButton",
+                  background=[('active', Colour.EQUAL_BTN["back_act"])])
+
+        style.configure("Clear.TButton",
+                        background=Colour.CLEAR_BTN["background"],
+                        lightcolor=Colour.CLEAR_BTN["border"],
+                        darkcolor=Colour.CLEAR_BTN["border"],
+                        bordercolor=Colour.CLEAR_BTN["border"])
+
+        style.map("Clear.TButton",
+                  background=[('active', Colour.CLEAR_BTN["back_act"])],
+                  lightcolor=[('active', Colour.CLEAR_BTN["border_act"])],
+                  darkcolor=[('active', Colour.CLEAR_BTN["border_act"])])
+
+        btn_clear = ttk.Button(self.root, text="C", command=self.clear, style="Clear.TButton")
+        btn_clear.grid(column=1, row=3, ipadx=self.pad_x, ipady=self.pad_y)
+
+        btn_del = ttk.Button(self.root, text="del", command=self.del_btn)
+        btn_del.grid(column=2, row=3, ipadx=self.pad_x, ipady=self.pad_y)
+
+        btn_square = ttk.Button(self.root, text="x^2", command=lambda: self.operation("**"))
+        btn_square.grid(column=3, row=3, ipadx=self.pad_x, ipady=self.pad_y)
+
+        btn_zero = ttk.Button(self.root, text="0", command=lambda: self.insert_num(0))
+        btn_zero.grid(column=1, row=7, ipadx=41, ipady=self.pad_y, columnspan=2, sticky=tk.W)
+
+        for number in range(9):
+            ttk.Button(self.root,
+                       text=str(number + 1),
+                       command=lambda j=number: self.insert_num(j + 1)).grid(column=(number % 3) + 1,
+                                                                             row=(number // 3) + 4,
+                                                                             ipadx=self.pad_x,
+                                                                             ipady=self.pad_y)
+
+        btn_add = ttk.Button(self.root, text="+", command=lambda: self.operation("+"))
+        btn_add.grid(column=4, row=3, ipadx=self.pad_x, ipady=self.pad_y)
+
+        btn_sub = ttk.Button(self.root, text="-", command=lambda: self.operation("-"))
+        btn_sub.grid(column=4, row=4, ipadx=self.pad_x, ipady=self.pad_y)
+
+        btn_multi = ttk.Button(self.root, text="x", command=lambda: self.operation("*"))
+        btn_multi.grid(column=4, row=5, ipadx=self.pad_x, ipady=self.pad_y)
+
+        btn_div = ttk.Button(self.root, text="/", command=lambda: self.operation("/"))
+        btn_div.grid(column=4, row=6, ipadx=self.pad_x, ipady=self.pad_y)
+
+        btn_decimal = ttk.Button(self.root, text=".", command=lambda: self.insert_num("."))
+        btn_decimal.grid(column=3, row=7, ipadx=self.pad_x, ipady=self.pad_y)
+
+        btn_equal = ttk.Button(self.root, text="=", command=self.equal, style="Equal.TButton")
+        btn_equal.grid(column=4, row=7, ipadx=self.pad_x, ipady=self.pad_y)
+
+        self.root.mainloop()
+
+    def insert_num(self, num):
+        start_num = self.equation_lbl.cget("text")
+        if start_num == "0":
+            self.equation_lbl.configure(text=str(num))
+        else:
+            new_num = str(start_num) + str(num)
+            self.equation_lbl.configure(text=str(new_num))
+
+    def clear(self):
+        self.equation_lbl.configure(text="0")
+        self.result.configure(text="")
+
+    def reset_equation(self):
+        result_entry = str(self.result.cget("text"))
+        if len(result_entry) > 0:
+            self.equation_lbl.configure(text=result_entry)
+        else:
+            pass
+
+    def operation(self, op):
+        self.reset_equation()
+        start_num = self.equation_lbl.cget("text")
+        start_num = str(start_num)
+        valid = False
+        # checks for number on the end side of operator
+        if op == "*" or op == "/":
+            length = len(start_num)
+            last = start_num[length - 1]
+            if last == "*" or last == "/":
+                valid = False
+            else:
+                valid = True
+        elif op == "**":
+            operator = start_num + op + "2"
+            self.equation_lbl.configure(text=operator)
+        else:
+            valid = True
+
+        if valid:
+            operator = start_num + op
+            self.equation_lbl.configure(text=operator)
+
+    def equal(self):
+        equation = str(self.equation_lbl.cget("text"))
+        ans = str(eval(equation))
+        if len(ans) > 10:
+            ans = ans[:10] + "..."
+        self.result.configure(text=ans)
+
+    def del_btn(self):
+        equation = str(self.equation_lbl.cget("text"))
+        length = len(equation) - 1
+        if length == 0:
+            self.equation_lbl.configure(text="0")
+        else:
+            new_equation = equation[0:length]
+            self.equation_lbl.configure(text=new_equation)
