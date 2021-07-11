@@ -9,10 +9,12 @@ class Calculator:
         self.pad_y = 18
 
         self.root = tk.Tk()
-        self.style = ttk.Style(self.root)
         self.equation_lbl = tk.Label(self.root, text="0", bg=Colour.BACK, fg=Colour.BEIGE, anchor=tk.S,
                                      font=("calibri", 15))
+        self.equation_lbl.grid(column=1, row=1, ipady=15, columnspan=3, sticky=tk.E)
+
         self.result = tk.Label(self.root, text="", bg=Colour.BACK, fg="white", anchor=tk.N, font=("calibri", 30))
+        self.result.grid(column=1, row=2, ipady=25, columnspan=3, sticky=tk.E)
 
         self.setup()
 
@@ -20,10 +22,6 @@ class Calculator:
         self.root.geometry("320x500")
         self.root.title("Calculator")
         self.root.configure(bg=Colour.BACK)
-
-        self.equation_lbl.grid(column=1, row=1, ipady=15, columnspan=3, sticky=tk.E)
-
-        self.result.grid(column=1, row=2, ipady=25, columnspan=3, sticky=tk.E)
 
         style = ttk.Style(self.root)
         style.theme_use("clam")
@@ -65,9 +63,6 @@ class Calculator:
         btn_del = ttk.Button(self.root, text="del", command=self.del_btn)
         btn_del.grid(column=2, row=3, ipadx=self.pad_x, ipady=self.pad_y)
 
-        btn_square = ttk.Button(self.root, text="x^2", command=lambda: self.operation("**"))
-        btn_square.grid(column=3, row=3, ipadx=self.pad_x, ipady=self.pad_y)
-
         btn_zero = ttk.Button(self.root, text="0", command=lambda: self.insert_num(0))
         btn_zero.grid(column=1, row=7, ipadx=41, ipady=self.pad_y, columnspan=2, sticky=tk.W)
 
@@ -79,17 +74,16 @@ class Calculator:
                                                                              ipadx=self.pad_x,
                                                                              ipady=self.pad_y)
 
-        btn_add = ttk.Button(self.root, text="+", command=lambda: self.operation("+"))
-        btn_add.grid(column=4, row=3, ipadx=self.pad_x, ipady=self.pad_y)
+        btn_square = ttk.Button(self.root, text="x^2", command=lambda: self.operation("**"))
+        btn_square.grid(column=3, row=3, ipadx=self.pad_x, ipady=self.pad_y)
 
-        btn_sub = ttk.Button(self.root, text="-", command=lambda: self.operation("-"))
-        btn_sub.grid(column=4, row=4, ipadx=self.pad_x, ipady=self.pad_y)
-
-        btn_multi = ttk.Button(self.root, text="x", command=lambda: self.operation("*"))
-        btn_multi.grid(column=4, row=5, ipadx=self.pad_x, ipady=self.pad_y)
-
-        btn_div = ttk.Button(self.root, text="/", command=lambda: self.operation("/"))
-        btn_div.grid(column=4, row=6, ipadx=self.pad_x, ipady=self.pad_y)
+        operations = ["+", "-", "/", "*"]
+        i = 3
+        for op in operations:
+            ttk.Button(self.root, text=op, command=lambda j=op: self.operation(j)).grid(column=4, row=i,
+                                                                                        ipadx=self.pad_x,
+                                                                                        ipady=self.pad_y)
+            i += 1
 
         btn_decimal = ttk.Button(self.root, text=".", command=lambda: self.insert_num("."))
         btn_decimal.grid(column=3, row=7, ipadx=self.pad_x, ipady=self.pad_y)
@@ -101,11 +95,9 @@ class Calculator:
 
     def insert_num(self, num):
         start_num = self.equation_lbl.cget("text")
-        if start_num == "0":
-            self.equation_lbl.configure(text=str(num))
-        else:
-            new_num = str(start_num) + str(num)
-            self.equation_lbl.configure(text=str(new_num))
+        out = str(num) if start_num == "0" else str(start_num) + str(num)
+
+        self.equation_lbl.configure(text=out)
 
     def clear(self):
         self.equation_lbl.configure(text="0")
@@ -115,8 +107,6 @@ class Calculator:
         result_entry = str(self.result.cget("text"))
         if len(result_entry) > 0:
             self.equation_lbl.configure(text=result_entry)
-        else:
-            pass
 
     def operation(self, op):
         self.reset_equation()
