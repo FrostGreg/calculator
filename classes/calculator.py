@@ -7,6 +7,7 @@ class Calculator:
     def __init__(self):
         self.pad_x = 0
         self.pad_y = 18
+        self.operations = ["+", "-", "/", "*"]
 
         self.root = tk.Tk()
         self.equation_lbl = tk.Label(self.root, text="0", bg=Colour.BACK, fg=Colour.BEIGE, anchor=tk.S,
@@ -60,7 +61,7 @@ class Calculator:
         btn_clear = ttk.Button(self.root, text="C", command=self.clear, style="Clear.TButton")
         btn_clear.grid(column=1, row=3, ipadx=self.pad_x, ipady=self.pad_y)
 
-        btn_del = ttk.Button(self.root, text="del", command=self.del_btn)
+        btn_del = ttk.Button(self.root, text="del", command=self.delete)
         btn_del.grid(column=2, row=3, ipadx=self.pad_x, ipady=self.pad_y)
 
         btn_zero = ttk.Button(self.root, text="0", command=lambda: self.insert_num(0))
@@ -77,9 +78,8 @@ class Calculator:
         btn_square = ttk.Button(self.root, text="x^2", command=lambda: self.operation("**"))
         btn_square.grid(column=3, row=3, ipadx=self.pad_x, ipady=self.pad_y)
 
-        operations = ["+", "-", "/", "*"]
         i = 3
-        for op in operations:
+        for op in self.operations:
             ttk.Button(self.root, text=op, command=lambda j=op: self.operation(j)).grid(column=4, row=i,
                                                                                         ipadx=self.pad_x,
                                                                                         ipady=self.pad_y)
@@ -99,10 +99,6 @@ class Calculator:
 
         self.equation_lbl.configure(text=out)
 
-    def clear(self):
-        self.equation_lbl.configure(text="0")
-        self.result.configure(text="")
-
     def reset_equation(self):
         result_entry = str(self.result.cget("text"))
         if len(result_entry) > 0:
@@ -113,13 +109,10 @@ class Calculator:
         start_num = self.equation_lbl.cget("text")
         start_num = str(start_num)
         valid = False
-        # checks for number on the end side of operator
-        if op == "*" or op == "/":
-            length = len(start_num)
-            last = start_num[length - 1]
-            if last == "*" or last == "/":
-                valid = False
-            else:
+        # checks for number on the right side of operator
+        if op in self.operations:
+            last = start_num[-1]
+            if last not in self.operations:
                 valid = True
         elif op == "**":
             operator = start_num + op + "2"
@@ -137,12 +130,17 @@ class Calculator:
         if len(ans) > 10:
             ans = ans[:10] + "..."
         self.result.configure(text=ans)
+        
+    def clear(self):
+        self.equation_lbl.configure(text="0")
+        self.result.configure(text="")
 
-    def del_btn(self):
+    def delete(self):
         equation = str(self.equation_lbl.cget("text"))
         length = len(equation) - 1
         if length == 0:
-            self.equation_lbl.configure(text="0")
+            out = ""
         else:
-            new_equation = equation[0:length]
-            self.equation_lbl.configure(text=new_equation)
+            out = equation[:length]
+
+        self.equation_lbl.configure(text=out)
