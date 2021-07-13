@@ -20,7 +20,7 @@ class Calculator:
 
     def setup(self):
         self.root.geometry("320x500")
-        self.root.title("Calculator")
+        self.root.title("calculator")
         self.root.configure(bg=Colour.BACK)
 
         style = ttk.Style(self.root)
