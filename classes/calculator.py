@@ -21,7 +21,7 @@ class Calculator:
 
     def setup(self):
         self.root.geometry("320x500")
-        self.root.title("calculator")
+        self.root.title("Calculator")
         self.root.configure(bg=Colour.BACK)
 
         style = ttk.Style(self.root)
@@ -90,7 +90,7 @@ class Calculator:
             self.root.bind(op, lambda event, j=op: self.operation(j, event))
             i += 1
 
-        btn_decimal = ttk.Button(self.root, text=".", command=lambda event: self.insert_num(".", event))
+        btn_decimal = ttk.Button(self.root, text=".", command=lambda: self.insert_num("."))
         btn_decimal.grid(column=3, row=7, ipadx=self.pad_x, ipady=self.pad_y)
         self.root.bind('.', lambda event: self.insert_num('.', event))
 
@@ -103,6 +103,18 @@ class Calculator:
 
     def insert_num(self, num, event=None):
         start_num = self.equation_lbl.cget("text")
+
+        if num == '.':
+            valid = True
+            for char in start_num:
+                if not char.isnumeric() and char != '.':
+                    valid = True
+                elif char == '.':
+                    valid = False
+
+            if not valid:
+                num = ''
+
         out = str(num) if start_num == "0" else str(start_num) + str(num)
 
         self.equation_lbl.configure(text=out)
