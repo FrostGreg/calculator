@@ -126,6 +126,7 @@ class Calculator:
 
     def equal(self):
         equation = str(self.equation_lbl.cget("text"))
+        equation = equation.replace('...', '')
         ans = str(eval(equation))
         if len(ans) > 10:
             ans = ans[:10] + "..."
