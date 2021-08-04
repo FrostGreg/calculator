@@ -60,40 +60,48 @@ class Calculator:
 
         btn_clear = ttk.Button(self.root, text="C", command=self.clear, style="Clear.TButton")
         btn_clear.grid(column=1, row=3, ipadx=self.pad_x, ipady=self.pad_y)
+        self.root.bind('c', self.clear)
 
         btn_del = ttk.Button(self.root, text="del", command=self.delete)
         btn_del.grid(column=2, row=3, ipadx=self.pad_x, ipady=self.pad_y)
+        self.root.bind('<BackSpace>', self.delete)
 
         btn_zero = ttk.Button(self.root, text="0", command=lambda: self.insert_num(0))
         btn_zero.grid(column=1, row=7, ipadx=41, ipady=self.pad_y, columnspan=2, sticky=tk.W)
+        self.root.bind('0', lambda event: self.insert_num(0, event))
 
         for number in range(9):
             ttk.Button(self.root,
                        text=str(number + 1),
-                       command=lambda j=number: self.insert_num(j + 1)).grid(column=(number % 3) + 1,
-                                                                             row=(number // 3) + 4,
-                                                                             ipadx=self.pad_x,
-                                                                             ipady=self.pad_y)
+                       command=lambda event, j=number: self.insert_num(j + 1, event)).grid(column=(number % 3) + 1,
+                                                                                           row=(number // 3) + 4,
+                                                                                           ipadx=self.pad_x,
+                                                                                           ipady=self.pad_y)
+            self.root.bind(str(number + 1), lambda event, j=number: self.insert_num(j + 1, event))
 
         btn_square = ttk.Button(self.root, text="x^2", command=lambda: self.operation("**"))
         btn_square.grid(column=3, row=3, ipadx=self.pad_x, ipady=self.pad_y)
 
         i = 3
         for op in self.operations:
-            ttk.Button(self.root, text=op, command=lambda j=op: self.operation(j)).grid(column=4, row=i,
-                                                                                        ipadx=self.pad_x,
-                                                                                        ipady=self.pad_y)
+            ttk.Button(self.root, text=op, command=lambda event, j=op: self.operation(j, event)).grid(column=4, row=i,
+                                                                                                      ipadx=self.pad_x,
+                                                                                                      ipady=self.pad_y)
+            self.root.bind(op, lambda event, j=op: self.operation(j, event))
             i += 1
 
-        btn_decimal = ttk.Button(self.root, text=".", command=lambda: self.insert_num("."))
+        btn_decimal = ttk.Button(self.root, text=".", command=lambda event: self.insert_num(".", event))
         btn_decimal.grid(column=3, row=7, ipadx=self.pad_x, ipady=self.pad_y)
+        self.root.bind('.', lambda event: self.insert_num('.', event))
 
         btn_equal = ttk.Button(self.root, text="=", command=self.equal, style="Equal.TButton")
         btn_equal.grid(column=4, row=7, ipadx=self.pad_x, ipady=self.pad_y)
+        self.root.bind('<Return>', self.equal)
+        self.root.bind('=', self.equal)
 
         self.root.mainloop()
 
-    def insert_num(self, num):
+    def insert_num(self, num, event=None):
         start_num = self.equation_lbl.cget("text")
         out = str(num) if start_num == "0" else str(start_num) + str(num)
 
@@ -104,7 +112,7 @@ class Calculator:
         if len(result_entry) > 0:
             self.equation_lbl.configure(text=result_entry)
 
-    def operation(self, op):
+    def operation(self, op, event=None):
         self.reset_equation()
         start_num = self.equation_lbl.cget("text")
         start_num = str(start_num)
@@ -124,7 +132,7 @@ class Calculator:
             operator = start_num + op
             self.equation_lbl.configure(text=operator)
 
-    def equal(self):
+    def equal(self, event=None):
         equation = str(self.equation_lbl.cget("text"))
         equation = equation.replace('...', '')
         while not equation[-1].isnumeric():
@@ -133,12 +141,12 @@ class Calculator:
         if len(ans) > 10:
             ans = ans[:10] + "..."
         self.result.configure(text=ans)
-        
-    def clear(self):
+
+    def clear(self, event=None):
         self.equation_lbl.configure(text="0")
         self.result.configure(text="")
 
-    def delete(self):
+    def delete(self, event=None):
         equation = str(self.equation_lbl.cget("text"))
         length = len(equation) - 1
         if length == 0:
