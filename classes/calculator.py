@@ -111,12 +111,12 @@ class Calculator:
         valid = False
         # checks for number on the right side of operator
         if op in self.operations:
-            last = start_num[-1]
-            if last not in self.operations:
+            if start_num[-1] not in self.operations:
                 valid = True
         elif op == "**":
-            operator = start_num + op + "2"
-            self.equation_lbl.configure(text=operator)
+            op += "2"
+            if start_num[-1] not in self.operations:
+                valid = True
         else:
             valid = True
 
