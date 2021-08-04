@@ -127,6 +127,8 @@ class Calculator:
     def equal(self):
         equation = str(self.equation_lbl.cget("text"))
         equation = equation.replace('...', '')
+        while not equation[-1].isnumeric():
+            equation = equation[:-1]
         ans = str(eval(equation))
         if len(ans) > 10:
             ans = ans[:10] + "..."
